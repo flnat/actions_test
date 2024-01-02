@@ -1,0 +1,32 @@
+name: UnitTests
+on: [push, pull_request]
+
+jobs:
+    ci:
+        strategy:
+            fail-fast: false
+            matrix:
+                python_version: ["3.9", "3.10"]
+                poetry_version: ["1.2.2"]
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checking out repo ${{ github.ref}}
+              uses: actions/checkout@v4
+            - name: Install Python
+              uses: actions/setup_python@v4
+            - name: Install poetry
+              uses: abatilo/actions_poetry@v2
+            - name: Setting up local venv
+              run: |
+                poetry config virtualenvs.create true --local
+                poetry config virtualenvs.in-project true --local
+            - name: Define a cache for the virtual env using the lockfile
+              uses: actions/cache@v3
+              with:
+                path: ./.venv
+                key: venv-${{ hashFiles('poetry.lock') }}
+            - name: Installing dependencies
+              run: poetry install
+            # - name: Running the testsuite
+            #   run: poetry run pytest -v
+            
