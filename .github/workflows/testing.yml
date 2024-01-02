@@ -10,12 +10,16 @@ jobs:
                 poetry-version: ["1.2.2"]
         runs-on: ubuntu-latest
         steps:
-            - name: Checking out repo ${{ github.ref}}
+            - name: Checking out repo ${{ github.ref }}
               uses: actions/checkout@v4
             - name: Install Python
               uses: actions/setup-python@v4
+              with:
+                python-version: ${{ matrix.python-version }}
             - name: Install poetry
               uses: abatilo/actions-poetry@v2
+              with:
+                poetry-version: ${{ matrix.poetry-version }}
             - name: Setting up local venv
               run: |
                 poetry config virtualenvs.create true --local
@@ -27,6 +31,7 @@ jobs:
                 key: venv-${{ hashFiles('poetry.lock') }}
             - name: Installing dependencies
               run: poetry install
-            # - name: Running the testsuite
-            #   run: poetry run pytest -v
+            - name: Running the testsuite
+              working-directory: ./tests
+              run: poetry run pytest -v
             
